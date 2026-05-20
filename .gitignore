@@ -1,0 +1,16 @@
+.env
+*.env
+*.log
+*.tmp
+*.bak
+*.pyc
+__pycache__/
+.venv/
+venv/
+Outputs/
+Raw_Exports/*.xlsx
+Raw_Exports/~$*.xlsx
+run_log.txt
+
+!Outputs/OUTPUTS_WILL_APPEAR_HERE.txt
+!Raw_Exports/PUT_RAW_EXPORT_HERE.txt
