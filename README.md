@@ -22,6 +22,7 @@ The batch file will:
 - install required packages from `requirements.txt`,
 - auto-detect whether the export headers start on row 1 or row 3,
 - normalize common export header variants such as `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, and `Line Sum USD`,
+- apply the background image `Grey 44.PNG` to every generated worksheet,
 - find the newest `.xlsx` file in `Raw_Exports`,
 - run `forecast_processor.py`,
 - save the clean workbook into `Outputs`,

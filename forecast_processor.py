@@ -31,6 +31,9 @@ from typing import Dict, Iterable, Optional, Tuple
 import pandas as pd
 from openpyxl import load_workbook
 
+BACKGROUND_IMAGE_PATH = Path(
+    r"C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Documents\Shades of Grey\Shades of Grey\Grey 44.PNG"
+)
 
 INTERNAL_HELP_COLUMNS = {
     "# of Days in Quarter",
@@ -352,10 +355,16 @@ def summarize(df: pd.DataFrame, group_cols: Iterable[str]) -> pd.DataFrame:
     return result
 
 
+def apply_sheet_background(worksheet) -> None:
+    if BACKGROUND_IMAGE_PATH.exists():
+        worksheet.set_background(str(BACKGROUND_IMAGE_PATH))
+
+
 def make_dashboard(writer: pd.ExcelWriter, forecast: pd.DataFrame, quarter_end: pd.Timestamp, quarter_start: Optional[pd.Timestamp]) -> None:
     workbook = writer.book
     worksheet = workbook.add_worksheet("Dashboard")
     writer.sheets["Dashboard"] = worksheet
+    apply_sheet_background(worksheet)
 
     title_fmt = workbook.add_format({"bold": True, "font_size": 18, "font_color": "#1F4E78"})
     section_fmt = workbook.add_format({"bold": True, "font_size": 12, "font_color": "#FFFFFF", "bg_color": "#1F4E78", "border": 1})
@@ -475,6 +484,7 @@ def write_output(forecast: pd.DataFrame, config: ForecastConfig, quarter_end: pd
             "Summary_By_Customer": by_customer,
         }.items():
             worksheet = writer.sheets[sheet_name]
+            apply_sheet_background(worksheet)
             worksheet.freeze_panes(1, 0)
             for col_idx, col_name in enumerate(frame.columns):
                 worksheet.write(0, col_idx, col_name, header_fmt)
