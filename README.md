@@ -21,6 +21,7 @@ The batch file will:
 - create a local `.venv` folder on the first run,
 - install required packages from `requirements.txt`,
 - auto-detect whether the export headers start on row 1 or row 3,
+- normalize common export header variants such as `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, and `Line Sum USD`,
 - find the newest `.xlsx` file in `Raw_Exports`,
 - run `forecast_processor.py`,
 - save the clean workbook into `Outputs`,
@@ -49,7 +50,7 @@ python forecast_processor.py "Raw_Exports\Quotey Forecast - Copy.xlsx" --output 
 
 By default, the script reads the quarter-end date from `Export!B2`.
 
-If `Export!B2` is blank, the script now infers a quarter end from the workbook date columns so the run can still finish.
+If `Export!B2` is blank or contains a non-date token such as `Q03`, the script infers a quarter end from the workbook date columns so the run can still finish.
 
 You can also provide the quarter end directly:
 

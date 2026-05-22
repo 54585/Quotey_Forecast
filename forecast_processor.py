@@ -70,6 +70,17 @@ HEADER_MARKERS = {
     "In Forecast",
 }
 
+COLUMN_ALIASES = {
+    "Oppty Month": ["OpptyMonth"],
+    "CustGrp 1 Desc": ["CustGrp1 Desc"],
+    "Sales Region": ["Sls Region"],
+    "Sales Territory": ["Sls Territory"],
+    "Line#": ["#"],
+    "Line Start": ["Hdr Start", "Header Start Period"],
+    "Line End": ["Hdr End"],
+    "1YR Value": ["Line Sum USD", "line amt usd", "Quote Total USD"],
+}
+
 OUTPUT_DETAIL_COLUMNS = [
     "Sales Region",
     "Sales Territory",
@@ -161,6 +172,18 @@ def safe_series(df: pd.DataFrame, column: str, default: object = 0) -> pd.Series
     return pd.Series([default] * len(df), index=df.index)
 
 
+def apply_column_aliases(df: pd.DataFrame) -> pd.DataFrame:
+    renamed = df.copy()
+    for canonical, aliases in COLUMN_ALIASES.items():
+        if canonical in renamed.columns:
+            continue
+        for alias in aliases:
+            if alias in renamed.columns:
+                renamed = renamed.rename(columns={alias: canonical})
+                break
+    return renamed
+
+
 def infer_quarter_end_from_dates(df: pd.DataFrame) -> pd.Timestamp:
     for column_name in ("Line Start", "Oppty Month", "Hdr Start"):
         if column_name not in df.columns:
@@ -212,6 +235,7 @@ def read_export(config: ForecastConfig) -> pd.DataFrame:
     headers = [normalize_header(value, idx + 1) for idx, value in enumerate(raw.iloc[header_index].tolist())]
     df = raw.iloc[data_index:].copy()
     df.columns = headers
+    df = apply_column_aliases(df)
 
     # Drop completely empty rows and unneeded blank export columns.
     df = df.dropna(how="all")
@@ -304,8 +328,15 @@ def summarize(df: pd.DataFrame, group_cols: Iterable[str]) -> pd.DataFrame:
     cols = [col for col in group_cols if col in df.columns]
     if not cols:
         cols = ["Forecast Flag"] if "Forecast Flag" in df.columns else []
+    summary_frame = df.copy()
+    summary_frame["Quote#"] = safe_series(summary_frame, "Quote#", "")
+    summary_frame["1YR Value"] = pd.to_numeric(safe_series(summary_frame, "1YR Value", 0), errors="coerce").fillna(0)
+    summary_frame["In Quarter Revenue"] = pd.to_numeric(safe_series(summary_frame, "In Quarter Revenue", 0), errors="coerce").fillna(0)
+    summary_frame["Expected 1YR Value"] = pd.to_numeric(safe_series(summary_frame, "Expected 1YR Value", 0), errors="coerce").fillna(0)
+    summary_frame["Expected In Quarter Revenue"] = pd.to_numeric(safe_series(summary_frame, "Expected In Quarter Revenue", 0), errors="coerce").fillna(0)
+    summary_frame["Win Probability"] = pd.to_numeric(safe_series(summary_frame, "Win Probability", 0), errors="coerce").fillna(0)
     result = (
-        df.groupby(cols, dropna=False)
+        summary_frame.groupby(cols, dropna=False)
         .agg(
             Lines=("Quote#", "count"),
             Quotes=("Quote#", pd.Series.nunique),

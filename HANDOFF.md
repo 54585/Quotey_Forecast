@@ -48,7 +48,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 1
+- Committed program updates since last push: 2
 - Last push date: Not pushed yet
 - Last confirmed Git remote: None
 
@@ -71,8 +71,10 @@ After every three committed program updates, Codex must ask the user to confirm 
 - `Run_Quotey_Forecast.bat` now prefers a real local Python runtime, skips the Windows Store `python.exe` stub, creates a local `.venv`, installs requirements, and uses PowerShell `Get-Date -Format yyyy-MM-dd` for a stable output filename.
 - `forecast_processor.py` now auto-detects whether the `Export` sheet headers start on row 1 or row 3. The sample workbook `Raw_Exports\Test Exports.xlsx` uses row 1 headers.
 - `forecast_processor.py` no longer crashes when expected columns are missing; it uses safe default Series values instead of scalar fallbacks.
-- If `Export!B2` is blank, the processor now infers a quarter-end date from workbook date columns so the run can still complete.
+- `forecast_processor.py` now normalizes common alternate export headers into the canonical internal names. Verified examples from the 2026-05-22 export: `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, `Sls Territory`, `#`, and `Line Sum USD`.
+- If `Export!B2` is blank or contains a non-date token such as `Q03`, the processor infers a quarter-end date from workbook date columns so the run can still complete.
 - Verified on 2026-05-20 with `Test Exports.xlsx`: the processor created `Outputs\test_output.xlsx` successfully and processed 760 rows.
+- Verified on 2026-05-22 with `data - 2026-05-22T172921.787.xlsx`: the processor created `Outputs\repro_2026-05-22.xlsx` successfully and processed 387 rows.
 
 ## Important Files
 
@@ -84,5 +86,5 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Next-Session Notes
 
-- Re-check the inferred quarter-end behavior with the user if revenue totals look off. The current fallback uses workbook date columns when `Export!B2` is blank.
+- Re-check the inferred quarter-end behavior with the user if revenue totals look off. The current fallback uses workbook date columns when `Export!B2` is blank or contains a non-date token like `Q03`.
 - If the user wants this published, ask: `What Git address should this project use?`
