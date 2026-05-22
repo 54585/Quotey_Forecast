@@ -48,9 +48,9 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 4
-- Last push date: Not pushed yet
-- Last confirmed Git remote: None
+- Committed program updates since last push: 0
+- Last push date: 2026-05-22
+- Last confirmed Git remote: `https://github.com/54585/hybrid_forecast.git`
 
 ## Local State And Exclusions
 
@@ -90,4 +90,4 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 - Re-check the inferred quarter-end behavior with the user if revenue totals look off. The current fallback uses workbook date columns when `Export!B2` is blank or contains a non-date token like `Q03`.
 - If the user wants this published, ask: `What Git address should this project use?`
-- The committed-update counter is now above 3, so publishing is blocked until the user confirms the Git remote for this project.
+- Git remote confirmed on 2026-05-22 as `https://github.com/54585/hybrid_forecast.git`.
