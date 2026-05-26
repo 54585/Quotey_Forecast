@@ -8,7 +8,7 @@ Use this file as the durable project map for Codex sessions in this folder. Keep
 - Local path: `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Desktop\Codex Programs\hybrid_forecast`
 - Primary entry point: `Run_Quotey_Forecast.bat`
 - Main run command: Double-click `Run_Quotey_Forecast.bat`
-- Main test or self-check command: `.\.venv\Scripts\python.exe .\forecast_processor.py ".\Raw_Exports\Test Exports.xlsx" --output ".\Outputs\test_output.xlsx"`
+- Main test or self-check command: `.\.venv\Scripts\python.exe .\forecast_processor.py ".\Inputs\Test Exports.xlsx" --output ".\Outputs\test_output.xlsx"`
 - Runtime and key dependencies: Local `.venv` plus `pandas`, `openpyxl`, `xlsxwriter`
 - UI expectation: This project is a batch-driven desktop utility, not a Tkinter app.
 - Local Git repository: Initialized on 2026-05-20.
@@ -30,7 +30,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 1. Read `README.md` and `HANDOFF.md` before changing code.
 2. Confirm the current folder is `hybrid_forecast`.
 3. Check `git status`, current branch, and configured remote.
-4. Keep `.venv/`, `Outputs/`, `Raw_Exports/*.xlsx`, and `run_log.txt` out of commits unless the user explicitly asks for a tracked sample file.
+4. Keep `.venv/`, `Outputs/`, `Inputs/*.xlsx`, and `run_log.txt` out of commits unless the user explicitly asks for a tracked sample file.
 5. Identify the safest validation path before editing. Prefer the local `Test Exports.xlsx` workbook if it is available and not open in Excel.
 6. Preserve unrelated user changes. Do not reset, delete, or overwrite files unless the user explicitly asks.
 
@@ -48,7 +48,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 0
+- Committed program updates since last push: 1
 - Last push date: 2026-05-22
 - Last confirmed Git remote: `https://github.com/54585/hybrid_forecast.git`
 
@@ -56,7 +56,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 - `.venv/` is local runtime state and should not be committed.
 - `Outputs/` contains generated workbooks and should not be committed, except for the placeholder text file.
-- `Raw_Exports/*.xlsx` contains user data exports and should not be committed.
+- `Inputs/*.xlsx` contains user data exports and should not be committed.
 - `run_log.txt` is a local troubleshooting file and should not be committed.
 
 ## Safety Rules
@@ -69,7 +69,8 @@ After every three committed program updates, Codex must ask the user to confirm 
 ## Implementation Notes
 
 - `Run_Quotey_Forecast.bat` now prefers a real local Python runtime, skips the Windows Store `python.exe` stub, creates a local `.venv`, installs requirements, and uses PowerShell `Get-Date -Format yyyy-MM-dd` for a stable output filename.
-- `forecast_processor.py` now auto-detects whether the `Export` sheet headers start on row 1 or row 3. The sample workbook `Raw_Exports\Test Exports.xlsx` uses row 1 headers.
+- The input folder was renamed from `Raw_Exports` to `Inputs` on 2026-05-26. Launcher, docs, Git ignore rules, and sample commands were updated to use `Inputs`.
+- `forecast_processor.py` now auto-detects whether the `Export` sheet headers start on row 1 or row 3. The sample workbook `Inputs\Test Exports.xlsx` uses row 1 headers.
 - `forecast_processor.py` no longer crashes when expected columns are missing; it uses safe default Series values instead of scalar fallbacks.
 - `forecast_processor.py` now normalizes common alternate export headers into the canonical internal names. Verified examples from the 2026-05-22 export: `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, `Sls Territory`, `#`, and `Line Sum USD`.
 - Every generated worksheet now applies the background image `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Documents\Shades of Grey\Shades of Grey\Grey 44.PNG`.
@@ -77,6 +78,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 - Verified on 2026-05-20 with `Test Exports.xlsx`: the processor created `Outputs\test_output.xlsx` successfully and processed 760 rows.
 - Verified on 2026-05-22 with `data - 2026-05-22T172921.787.xlsx`: the processor created `Outputs\repro_2026-05-22.xlsx` successfully and processed 387 rows.
 - Verified on 2026-05-22 with `Outputs\background_check_2026-05-22.xlsx`: the workbook package contains `xl/media/image1.png`, and the worksheet XML files contain `<picture>` references, confirming the background image is embedded.
+- Verified on 2026-05-26 that `Run_Quotey_Forecast.bat` now reads from `Inputs\...`; the test run stopped only because `Outputs\Quotey_Forecast_Clean_2026-05-26.xlsx` was already locked and could not be overwritten.
 
 ## Important Files
 

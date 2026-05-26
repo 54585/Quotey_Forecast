@@ -6,7 +6,7 @@ This version keeps Excel as the final review/reporting format, but moves the fra
 
 1. Unzip the package.
 2. Open the `hybrid_forecast` folder.
-3. Put your latest raw Quotey export into the `Raw_Exports` folder.
+3. Put your latest raw Quotey export into the `Inputs` folder.
    - If the folder does not exist yet, double-click the `.bat` once and it will create it.
    - The workbook must contain a tab named `Export`.
 4. Double-click:
@@ -23,7 +23,7 @@ The batch file will:
 - auto-detect whether the export headers start on row 1 or row 3,
 - normalize common export header variants such as `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, and `Line Sum USD`,
 - apply the background image `Grey 44.PNG` to every generated worksheet,
-- find the newest `.xlsx` file in `Raw_Exports`,
+- find the newest `.xlsx` file in `Inputs`,
 - run `forecast_processor.py`,
 - save the clean workbook into `Outputs`,
 - open the finished workbook automatically.
@@ -35,7 +35,7 @@ hybrid_forecast/
   Run_Quotey_Forecast.bat
   forecast_processor.py
   requirements.txt
-  Raw_Exports/
+  Inputs/
     Your latest Quotey export.xlsx
   Outputs/
     Quotey_Forecast_Clean_YYYY-MM-DD.xlsx
@@ -46,7 +46,7 @@ hybrid_forecast/
 You can still run the processor manually:
 
 ```bash
-python forecast_processor.py "Raw_Exports\Quotey Forecast - Copy.xlsx" --output "Outputs\Quotey_Forecast_Clean.xlsx"
+python forecast_processor.py "Inputs\Quotey Forecast - Copy.xlsx" --output "Outputs\Quotey_Forecast_Clean.xlsx"
 ```
 
 By default, the script reads the quarter-end date from `Export!B2`.
@@ -56,7 +56,7 @@ If `Export!B2` is blank or contains a non-date token such as `Q03`, the script i
 You can also provide the quarter end directly:
 
 ```bash
-python forecast_processor.py "Raw_Exports\Quotey Forecast - Copy.xlsx" --quarter-end 2026-06-27 --output "Outputs\Quotey_Forecast_Clean.xlsx"
+python forecast_processor.py "Inputs\Quotey Forecast - Copy.xlsx" --quarter-end 2026-06-27 --output "Outputs\Quotey_Forecast_Clean.xlsx"
 ```
 
 ## Output workbook tabs

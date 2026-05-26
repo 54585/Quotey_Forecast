@@ -9,7 +9,7 @@ REM ==============================================================
 cd /d "%~dp0"
 
 set "APP_DIR=%~dp0"
-set "RAW_DIR=%APP_DIR%Raw_Exports"
+set "RAW_DIR=%APP_DIR%Inputs"
 set "OUTPUT_DIR=%APP_DIR%Outputs"
 set "LOG_FILE=%APP_DIR%run_log.txt"
 set "VENV_DIR=%APP_DIR%.venv"
@@ -89,7 +89,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Find newest .xlsx in Raw_Exports first, then this folder.
+REM Find newest .xlsx in Inputs first, then this folder.
 set "INPUT_FILE="
 for /f "delims=" %%F in ('dir /b /a-d /o-d "%RAW_DIR%\*.xlsx" 2^>nul') do (
     set "INPUT_FILE=%RAW_DIR%\%%F"

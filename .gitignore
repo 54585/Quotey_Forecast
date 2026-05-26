@@ -8,9 +8,9 @@ __pycache__/
 .venv/
 venv/
 Outputs/
-Raw_Exports/*.xlsx
-Raw_Exports/~$*.xlsx
+Inputs/*.xlsx
+Inputs/~$*.xlsx
 run_log.txt
 
 !Outputs/OUTPUTS_WILL_APPEAR_HERE.txt
-!Raw_Exports/PUT_RAW_EXPORT_HERE.txt
+!Inputs/PUT_RAW_EXPORT_HERE.txt
