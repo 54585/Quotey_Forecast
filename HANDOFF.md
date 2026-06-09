@@ -12,7 +12,7 @@ Use this file as the durable project map for Codex sessions in this folder. Keep
 - Runtime and key dependencies: Local `.venv` plus `pandas`, `openpyxl`, `xlsxwriter`
 - UI expectation: This project is a batch-driven desktop utility, not a Tkinter app.
 - Local Git repository: Initialized on 2026-05-20.
-- Git remote: `https://github.com/54585/hybrid_forecast.git`
+- Git remote: `https://github.com/54585/Quotey_Forecast.git`
 
 ## Maintenance Rule
 
@@ -48,9 +48,9 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 3
+- Committed program updates since last push: 0
 - Last push date: 2026-05-22
-- Last confirmed Git remote: `https://github.com/54585/hybrid_forecast.git`
+- Last confirmed Git remote: `https://github.com/54585/Quotey_Forecast.git`
 
 ## Local State And Exclusions
 
@@ -97,5 +97,4 @@ After every three committed program updates, Codex must ask the user to confirm 
 - Re-check the inferred quarter-end behavior with the user if revenue totals look off. The current fallback uses workbook date columns when `Export!B2` is blank or contains a non-date token like `Q03`.
 - If a future workbook needs a different commission-calendar year, extend the quarter-window generator or replace it with the new official PDF dates before changing the revenue math.
 - If the user wants this published, ask: `What Git address should this project use?`
-- Git remote confirmed on 2026-05-22 as `https://github.com/54585/hybrid_forecast.git`.
-- The committed-update counter is now at 3, so reconfirm the Git remote before the next push.
+- Git remote confirmed on 2026-06-08 as `https://github.com/54585/Quotey_Forecast.git`.
