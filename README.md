@@ -23,6 +23,7 @@ The batch file will:
 - auto-detect whether the export headers start on row 1 or row 3,
 - normalize common export header variants such as `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, and `Line Sum USD`,
 - apply the background image `Grey 44.PNG` to every generated worksheet,
+- include `CustGrp 2 Desc` in `Forecast_Detail` immediately to the right of `CustGrp 1 Desc`,
 - find the newest `.xlsx` file in `Inputs`,
 - run `forecast_processor.py`,
 - save the clean workbook into `Outputs`,
@@ -49,9 +50,16 @@ You can still run the processor manually:
 python forecast_processor.py "Inputs\Quotey Forecast - Copy.xlsx" --output "Outputs\Quotey_Forecast_Clean.xlsx"
 ```
 
-By default, the script reads the quarter-end date from `Export!B2`.
+By default, the script now calculates `In Quarter Revenue` using service-date overlap against the LSG commission quarter windows. The current implementation uses 13-week Sunday-to-Saturday fiscal quarters, with the next quarter starting on the Sunday on or before January 1.
 
-If `Export!B2` is blank or contains a non-date token such as `Q03`, the script infers a quarter end from the workbook date columns so the run can still finish.
+For the 2026 commission calendar from the PDF, that means:
+
+- `Q1 2026`: `2025-12-28` through `2026-03-28`
+- `Q2 2026`: `2026-03-29` through `2026-06-27`
+- `Q3 2026`: `2026-06-28` through `2026-09-26`
+- `Q4 2026`: `2026-09-27` through `2026-12-26`
+
+Rows are anchored to their service dates first (`Line Start`, then `Hdr Start`, then `Oppty Month`) so late-2025 service dates can still roll into `Q1 2026` correctly.
 
 You can also provide the quarter end directly:
 

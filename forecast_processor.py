@@ -94,6 +94,7 @@ OUTPUT_DETAIL_COLUMNS = [
     "In Forecast",
     "Big Deal",
     "CustGrp 1 Desc",
+    "CustGrp 2 Desc",
     "Win Probability",
     "1YR Value",
     "In Quarter Revenue",
@@ -203,6 +204,46 @@ def infer_quarter_end_from_dates(df: pd.DataFrame) -> pd.Timestamp:
     )
 
 
+def build_commission_quarter_windows(year: int) -> list[Tuple[pd.Timestamp, pd.Timestamp, str]]:
+    jan_first = pd.Timestamp(year=year, month=1, day=1)
+    q1_start = jan_first - pd.Timedelta(days=(jan_first.dayofweek + 1) % 7)
+    q2_start = q1_start + pd.Timedelta(weeks=13)
+    q3_start = q2_start + pd.Timedelta(weeks=13)
+    q4_start = q3_start + pd.Timedelta(weeks=13)
+
+    next_jan_first = pd.Timestamp(year=year + 1, month=1, day=1)
+    next_q1_start = next_jan_first - pd.Timedelta(days=(next_jan_first.dayofweek + 1) % 7)
+
+    starts = [q1_start, q2_start, q3_start, q4_start]
+    ends = [q2_start - pd.Timedelta(days=1), q3_start - pd.Timedelta(days=1), q4_start - pd.Timedelta(days=1), next_q1_start - pd.Timedelta(days=1)]
+    return [(start, end, f"Q{index} {year}") for index, (start, end) in enumerate(zip(starts, ends), start=1)]
+
+
+def find_commission_quarter_window(anchor_date: pd.Timestamp) -> Tuple[pd.Timestamp, pd.Timestamp, str]:
+    if pd.isna(anchor_date):
+        raise ValueError("Commission quarter could not be determined because the anchor date was blank.")
+
+    normalized = pd.Timestamp(anchor_date).normalize()
+    candidate_years = [normalized.year - 1, normalized.year, normalized.year + 1]
+    for year in candidate_years:
+        for start, end, label in build_commission_quarter_windows(year):
+            if start <= normalized <= end:
+                return start, end, label
+
+    raise ValueError(
+        f"No commission-quarter window matched anchor date {normalized.date()}. "
+        "Update the commission-calendar logic before processing this workbook."
+    )
+
+
+def determine_row_quarter_anchor(row: pd.Series) -> pd.Timestamp:
+    for column_name in ("Line Start", "Hdr Start", "Oppty Month"):
+        value = row.get(column_name)
+        if pd.notna(value):
+            return pd.Timestamp(value)
+    return pd.NaT
+
+
 def read_quarter_end(config: ForecastConfig) -> pd.Timestamp:
     if config.quarter_end is not None:
         return config.quarter_end
@@ -299,15 +340,44 @@ def add_forecast_fields(df: pd.DataFrame, quarter_end: pd.Timestamp, quarter_sta
     out = df.copy()
     one_year_value = pd.to_numeric(safe_series(out, "1YR Value", 0), errors="coerce").fillna(0)
 
-    if quarter_start is not None and "Line End" in out.columns:
+    if quarter_start is not None:
+        effective_quarter_start = pd.Timestamp(quarter_start).normalize()
+        effective_quarter_end = pd.Timestamp(quarter_end).normalize()
+        out["Quarter Start"] = effective_quarter_start
+        out["Quarter End"] = effective_quarter_end
+        out["Commission Quarter"] = f"Manual {effective_quarter_start.date()} to {effective_quarter_end.date()}"
         out["# of Days in Quarter"] = [
-            calculate_days_overlap(start, end, quarter_start, quarter_end)
+            calculate_days_overlap(start, end, effective_quarter_start, effective_quarter_end)
             for start, end in zip(safe_series(out, "Line Start", pd.NaT), safe_series(out, "Line End", pd.NaT))
         ]
-        out["Calculation Mode"] = "Quarter service-day overlap"
+        out["Calculation Mode"] = "Manual quarter window overlap"
     else:
-        out["# of Days in Quarter"] = [calculate_days_remaining(start, quarter_end) for start in safe_series(out, "Line Start", pd.NaT)]
-        out["Calculation Mode"] = "Workbook-compatible days from Line Start to quarter end"
+        quarter_starts: list[pd.Timestamp] = []
+        quarter_ends: list[pd.Timestamp] = []
+        quarter_labels: list[str] = []
+        quarter_days: list[float] = []
+
+        for _, row in out.iterrows():
+            line_start = row.get("Line Start", pd.NaT)
+            line_end = row.get("Line End", pd.NaT)
+            anchor_date = determine_row_quarter_anchor(row)
+            if pd.isna(anchor_date):
+                quarter_starts.append(pd.NaT)
+                quarter_ends.append(pd.NaT)
+                quarter_labels.append("Unmapped")
+                quarter_days.append(0.0)
+                continue
+            q_start, q_end, q_label = find_commission_quarter_window(anchor_date)
+            quarter_starts.append(q_start)
+            quarter_ends.append(q_end)
+            quarter_labels.append(q_label)
+            quarter_days.append(calculate_days_overlap(line_start, line_end, q_start, q_end))
+
+        out["Quarter Start"] = quarter_starts
+        out["Quarter End"] = quarter_ends
+        out["Commission Quarter"] = quarter_labels
+        out["# of Days in Quarter"] = quarter_days
+        out["Calculation Mode"] = "2026 LSG commission-quarter overlap from PDF calendar"
 
     out["In Quarter Revenue"] = one_year_value / 365.0 * pd.to_numeric(out["# of Days in Quarter"], errors="coerce").fillna(0)
     out["Win Probability"] = safe_series(out, "CustGrp 1 Desc", "").apply(probability_from_stage)
@@ -380,9 +450,11 @@ def make_dashboard(writer: pd.ExcelWriter, forecast: pd.DataFrame, quarter_end: 
     not_forecast = forecast[forecast["Forecast Flag"].ne("Yes")]
 
     worksheet.write("A1", "Quotey Forecast Dashboard", title_fmt)
-    worksheet.write("A2", f"Quarter end: {quarter_end.date()}")
     if quarter_start is not None:
+        worksheet.write("A2", f"Quarter end: {quarter_end.date()}")
         worksheet.write("B2", f"Quarter start: {quarter_start.date()}")
+    else:
+        worksheet.write("A2", "Commission quarter: row-specific 2026 LSG PDF calendar")
     worksheet.write("A3", "Generated by forecast_processor.py", note_fmt)
 
     kpis = [
@@ -524,7 +596,10 @@ def main() -> None:
 
     print(f"Created {config.output_file}")
     print(f"Rows processed: {len(forecast):,}")
-    print(f"Quarter end: {quarter_end.date()}")
+    if config.quarter_start is not None:
+        print(f"Quarter end: {quarter_end.date()}")
+    else:
+        print("Quarter end: row-specific 2026 LSG commission calendar")
 
 
 if __name__ == "__main__":

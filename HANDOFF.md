@@ -48,7 +48,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 1
+- Committed program updates since last push: 2
 - Last push date: 2026-05-22
 - Last confirmed Git remote: `https://github.com/54585/hybrid_forecast.git`
 
@@ -75,10 +75,13 @@ After every three committed program updates, Codex must ask the user to confirm 
 - `forecast_processor.py` now normalizes common alternate export headers into the canonical internal names. Verified examples from the 2026-05-22 export: `OpptyMonth`, `CustGrp1 Desc`, `Sls Region`, `Sls Territory`, `#`, and `Line Sum USD`.
 - Every generated worksheet now applies the background image `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Documents\Shades of Grey\Shades of Grey\Grey 44.PNG`.
 - If `Export!B2` is blank or contains a non-date token such as `Q03`, the processor infers a quarter-end date from workbook date columns so the run can still complete.
+- `Forecast_Detail` now includes `CustGrp 2 Desc` immediately to the right of `CustGrp 1 Desc`.
+- `In Quarter Revenue` now uses commission-quarter overlap rather than the old "days from line start to quarter end" shortcut. The fiscal windows are generated as 13-week Sunday-to-Saturday quarters, which matches the 2026 PDF calendar and lets late-2025 service dates roll into `Q1 2026`.
 - Verified on 2026-05-20 with `Test Exports.xlsx`: the processor created `Outputs\test_output.xlsx` successfully and processed 760 rows.
 - Verified on 2026-05-22 with `data - 2026-05-22T172921.787.xlsx`: the processor created `Outputs\repro_2026-05-22.xlsx` successfully and processed 387 rows.
 - Verified on 2026-05-22 with `Outputs\background_check_2026-05-22.xlsx`: the workbook package contains `xl/media/image1.png`, and the worksheet XML files contain `<picture>` references, confirming the background image is embedded.
 - Verified on 2026-05-26 that `Run_Quotey_Forecast.bat` now reads from `Inputs\...`; the test run stopped only because `Outputs\Quotey_Forecast_Clean_2026-05-26.xlsx` was already locked and could not be overwritten.
+- Verified on 2026-06-08 with `Inputs\data (10).xlsx`: the processor created `Outputs\commission_calendar_check_2026-06-08.xlsx` successfully, processed 511 rows, placed `CustGrp 2 Desc` immediately after `CustGrp 1 Desc`, and produced row-specific commission-quarter overlap revenue.
 
 ## Important Files
 
@@ -91,5 +94,6 @@ After every three committed program updates, Codex must ask the user to confirm 
 ## Next-Session Notes
 
 - Re-check the inferred quarter-end behavior with the user if revenue totals look off. The current fallback uses workbook date columns when `Export!B2` is blank or contains a non-date token like `Q03`.
+- If a future workbook needs a different commission-calendar year, extend the quarter-window generator or replace it with the new official PDF dates before changing the revenue math.
 - If the user wants this published, ask: `What Git address should this project use?`
 - Git remote confirmed on 2026-05-22 as `https://github.com/54585/hybrid_forecast.git`.
