@@ -4,15 +4,15 @@ Use this file as the durable project map for Codex sessions in this folder. Keep
 
 ## Project Snapshot
 
-- Project name: `hybrid_forecast`
-- Local path: `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Desktop\Codex Programs\hybrid_forecast`
+- Project name: `Quotey Forecast`
+- Local path: `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Desktop\Codex Programs\Quotey Forecast`
 - Primary entry point: `Run_Quotey_Forecast.bat`
 - Main run command: Double-click `Run_Quotey_Forecast.bat`
 - Main test or self-check command: `.\.venv\Scripts\python.exe .\forecast_processor.py ".\Inputs\Test Exports.xlsx" --output ".\Outputs\test_output.xlsx"`
 - Runtime and key dependencies: Local `.venv` plus `pandas`, `openpyxl`, `xlsxwriter`
 - UI expectation: This project is a batch-driven desktop utility, not a Tkinter app.
 - Local Git repository: Initialized on 2026-05-20.
-- Git remote: Not configured yet. Ask the user before adding one or pushing.
+- Git remote: `https://github.com/54585/hybrid_forecast.git`
 
 ## Maintenance Rule
 
@@ -28,7 +28,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 ## Session Start Checklist
 
 1. Read `README.md` and `HANDOFF.md` before changing code.
-2. Confirm the current folder is `hybrid_forecast`.
+2. Confirm the current folder is `Quotey Forecast`.
 3. Check `git status`, current branch, and configured remote.
 4. Keep `.venv/`, `Outputs/`, `Inputs/*.xlsx`, and `run_log.txt` out of commits unless the user explicitly asks for a tracked sample file.
 5. Identify the safest validation path before editing. Prefer the local `Test Exports.xlsx` workbook if it is available and not open in Excel.
@@ -48,7 +48,7 @@ After every three committed program updates, Codex must ask the user to confirm 
 
 ## Committed-Update Counter
 
-- Committed program updates since last push: 2
+- Committed program updates since last push: 3
 - Last push date: 2026-05-22
 - Last confirmed Git remote: `https://github.com/54585/hybrid_forecast.git`
 
@@ -76,7 +76,8 @@ After every three committed program updates, Codex must ask the user to confirm 
 - Every generated worksheet now applies the background image `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Documents\Shades of Grey\Shades of Grey\Grey 44.PNG`.
 - If `Export!B2` is blank or contains a non-date token such as `Q03`, the processor infers a quarter-end date from workbook date columns so the run can still complete.
 - `Forecast_Detail` now includes `CustGrp 2 Desc` immediately to the right of `CustGrp 1 Desc`.
-- `In Quarter Revenue` now uses commission-quarter overlap rather than the old "days from line start to quarter end" shortcut. The fiscal windows are generated as 13-week Sunday-to-Saturday quarters, which matches the 2026 PDF calendar and lets late-2025 service dates roll into `Q1 2026`.
+- `In Quarter Revenue` now uses commission-quarter overlap rather than the old "days from line start to quarter end" shortcut. The fiscal windows are generated as Sunday-to-Saturday fiscal quarters, and `Q4 2026` explicitly runs through `2026-12-31` per the commission-calendar requirement.
+- The original `hybrid_forecast` folder could not be renamed in place because Windows reported it was in use. A fully working copy was created at `C:\Users\olufemi.amurawaiye\OneDrive - Thermo Fisher Scientific\Desktop\Codex Programs\Quotey Forecast` and verified there.
 - Verified on 2026-05-20 with `Test Exports.xlsx`: the processor created `Outputs\test_output.xlsx` successfully and processed 760 rows.
 - Verified on 2026-05-22 with `data - 2026-05-22T172921.787.xlsx`: the processor created `Outputs\repro_2026-05-22.xlsx` successfully and processed 387 rows.
 - Verified on 2026-05-22 with `Outputs\background_check_2026-05-22.xlsx`: the workbook package contains `xl/media/image1.png`, and the worksheet XML files contain `<picture>` references, confirming the background image is embedded.
@@ -97,3 +98,4 @@ After every three committed program updates, Codex must ask the user to confirm 
 - If a future workbook needs a different commission-calendar year, extend the quarter-window generator or replace it with the new official PDF dates before changing the revenue math.
 - If the user wants this published, ask: `What Git address should this project use?`
 - Git remote confirmed on 2026-05-22 as `https://github.com/54585/hybrid_forecast.git`.
+- The committed-update counter is now at 3, so reconfirm the Git remote before the next push.

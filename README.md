@@ -5,7 +5,7 @@ This version keeps Excel as the final review/reporting format, but moves the fra
 ## One-click usage
 
 1. Unzip the package.
-2. Open the `hybrid_forecast` folder.
+2. Open the `Quotey Forecast` folder.
 3. Put your latest raw Quotey export into the `Inputs` folder.
    - If the folder does not exist yet, double-click the `.bat` once and it will create it.
    - The workbook must contain a tab named `Export`.
@@ -32,7 +32,7 @@ The batch file will:
 ## Recommended folder structure
 
 ```text
-hybrid_forecast/
+Quotey Forecast/
   Run_Quotey_Forecast.bat
   forecast_processor.py
   requirements.txt
@@ -50,14 +50,14 @@ You can still run the processor manually:
 python forecast_processor.py "Inputs\Quotey Forecast - Copy.xlsx" --output "Outputs\Quotey_Forecast_Clean.xlsx"
 ```
 
-By default, the script now calculates `In Quarter Revenue` using service-date overlap against the LSG commission quarter windows. The current implementation uses 13-week Sunday-to-Saturday fiscal quarters, with the next quarter starting on the Sunday on or before January 1.
+By default, the script now calculates `In Quarter Revenue` using service-date overlap against the LSG commission quarter windows. The current implementation uses Sunday-to-Saturday fiscal quarters, with `Q1` starting on the Sunday on or before January 1. For 2026, `Q4` is explicitly extended through `2026-12-31`.
 
 For the 2026 commission calendar from the PDF, that means:
 
 - `Q1 2026`: `2025-12-28` through `2026-03-28`
 - `Q2 2026`: `2026-03-29` through `2026-06-27`
 - `Q3 2026`: `2026-06-28` through `2026-09-26`
-- `Q4 2026`: `2026-09-27` through `2026-12-26`
+- `Q4 2026`: `2026-09-27` through `2026-12-31`
 
 Rows are anchored to their service dates first (`Line Start`, then `Hdr Start`, then `Oppty Month`) so late-2025 service dates can still roll into `Q1 2026` correctly.
 

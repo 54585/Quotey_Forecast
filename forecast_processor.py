@@ -211,11 +211,13 @@ def build_commission_quarter_windows(year: int) -> list[Tuple[pd.Timestamp, pd.T
     q3_start = q2_start + pd.Timedelta(weeks=13)
     q4_start = q3_start + pd.Timedelta(weeks=13)
 
-    next_jan_first = pd.Timestamp(year=year + 1, month=1, day=1)
-    next_q1_start = next_jan_first - pd.Timedelta(days=(next_jan_first.dayofweek + 1) % 7)
-
     starts = [q1_start, q2_start, q3_start, q4_start]
-    ends = [q2_start - pd.Timedelta(days=1), q3_start - pd.Timedelta(days=1), q4_start - pd.Timedelta(days=1), next_q1_start - pd.Timedelta(days=1)]
+    ends = [
+        q2_start - pd.Timedelta(days=1),
+        q3_start - pd.Timedelta(days=1),
+        q4_start - pd.Timedelta(days=1),
+        pd.Timestamp(year=year, month=12, day=31),
+    ]
     return [(start, end, f"Q{index} {year}") for index, (start, end) in enumerate(zip(starts, ends), start=1)]
 
 
